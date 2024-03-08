@@ -4,10 +4,18 @@
 #include "Player/AuraPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Interfaces/HighlightInterface.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true;
+}
+
+void AAuraPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();
 }
 
 void AAuraPlayerController::BeginPlay()
@@ -50,3 +58,24 @@ void AAuraPlayerController::Move(const FInputActionInstance& Instance)
 	}
 }
 
+void AAuraPlayerController::CursorTrace()
+{
+	FHitResult CursorHitResult;
+	GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, CursorHitResult);
+	if (!CursorHitResult.bBlockingHit) return;
+
+	LastActor = CurrentActor;
+	CurrentActor = Cast<IHighlightInterface>(CursorHitResult.GetActor());
+
+	if (CurrentActor != LastActor)
+	{
+		if (LastActor != nullptr)
+		{
+			LastActor->UnHightlightActor();
+		}
+		if (CurrentActor != nullptr)
+		{
+			CurrentActor->HighlightActor();
+		}
+	}
+}
