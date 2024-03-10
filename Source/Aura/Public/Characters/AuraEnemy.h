@@ -20,4 +20,7 @@ public:
 
 	virtual void HighlightActor() override;
 	virtual void UnHightlightActor() override;
+
+protected:
+	virtual void BeginPlay() override;
 };
